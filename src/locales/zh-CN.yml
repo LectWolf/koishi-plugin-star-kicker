@@ -1,0 +1,11 @@
+commands:
+  kick:
+    description: 踢出不活跃群员
+    messages:
+      invalid-num: "格式: 踢出 <数量>"
+      continue: |-
+        是否确认踢出
+        {num} 个
+        不活跃成员?
+        ——————————
+        请再输入相同命令确认操作.

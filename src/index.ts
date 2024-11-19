@@ -1,11 +1,12 @@
-import { Context, Schema } from 'koishi'
+import { Context, Schema } from "koishi";
+import * as groupmanager from "./groupmanager";
+import { Config } from "./config";
 
-export const name = 'star-kicker'
+export const name = "star-kicker";
+export const reusable = true;
 
-export interface Config {}
+export * from "./config";
 
-export const Config: Schema<Config> = Schema.object({})
-
-export function apply(ctx: Context) {
-  // write your plugin here
+export function apply(ctx: Context, config: Config) {
+  ctx.plugin(groupmanager, config);
 }
