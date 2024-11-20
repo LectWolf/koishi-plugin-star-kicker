@@ -4,8 +4,15 @@ commands:
     messages:
       invalid-num: "格式: 踢出 <数量>"
       continue: |-
-        是否确认踢出
-        {num} 个
+        是否确认踢出 {num} 个
         不活跃成员?
+        条件: 
+        未发言{kicksent}天前
+        加群{kickJoin}天前
+        活跃等级{kickLevel}级以下
         ——————————
         请再输入相同命令确认操作.
+      kick-success: |-
+        成功踢出 {num} 个
+        不活跃成员.
+        具体踢出请查看后台日志

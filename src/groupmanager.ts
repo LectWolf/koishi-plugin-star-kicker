@@ -47,24 +47,48 @@ export function apply(ctx: Context, config: Config) {
         h.text(
           session.text(".continue", {
             num: num,
+            kicksent: config.kickSent,
+            kickJoin: config.kickJoin,
+            kickLevel: config.kickLevel,
           })
         )
       );
       if (!(await waitcheck(ctx, session))) {
         return;
       }
-    });
 
-  ctx
-    .command("test")
-    .alias("测试")
-    .action(async ({ session }, num) => {
-      if (!config.admin.includes(session.userId)) {
-        // 无权限
-        return;
+      const memberData = await session.bot.internal.getGroupMemberList(
+        session.guildId
+      );
+
+      const kickSentTime = Math.floor(
+        (Date.now() - config.kickSent * 24 * 60 * 60 * 1000) / 1000
+      ); // 发言N天前
+      const kickJoinTime = Math.floor(
+        (Date.now() - config.kickJoin * 24 * 60 * 60 * 1000) / 1000
+      ); // 加群N天前
+
+      const filteredMembers = memberData
+        .filter(
+          (member) =>
+            member.last_sent_time < kickSentTime &&
+            member.join_time < kickJoinTime &&
+            parseInt(member.level) < config.kickLevel &&
+            member.role == "member"
+        ) // 筛选条件 活跃等级<N级 群员
+        .sort((a, b) => a.last_sent_time - b.last_sent_time); // 按 last_sent_time 升序排序
+
+      const membersToKick = filteredMembers.slice(0, num);
+
+      for (const member of membersToKick) {
+        await session.bot.internal.setGroupKick(
+          session.guildId,
+          member.user_id
+        );
+        console.log(`正在踢出 QQ: ${member.user_id} 昵称: ${member.nickname}`);
       }
-      console.log(
-        await session.bot.internal.getGroupMemberList(session.guildId)
+      return h.text(
+        session.text(".kick-success", { num: membersToKick.length })
       );
     });
 }
